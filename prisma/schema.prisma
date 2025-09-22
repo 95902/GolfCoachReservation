@@ -1,0 +1,174 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          UserRole  @default(USER)
+  password      String?
+  
+  accounts      Account[]
+  sessions      Session[]
+  customers     Customer[]
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Customer {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String   @unique
+  phone     String
+  userId    String?  // Link to User account if customer registers
+  user      User?    @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+  
+  @@map("customers")
+}
+
+model Booking {
+  id              String          @id @default(cuid())
+  customerId      String
+  customer        Customer        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  
+  type            BookingType
+  status          BookingStatus   @default(PENDING)
+  
+  // For indoor bookings
+  bookingDate     DateTime?
+  duration        Int?            // Duration in minutes
+  price           Float?
+  
+  // For accompanied bookings
+  preferredDate   DateTime?
+  experienceLevel String?
+  numberOfPlayers Int?            @default(1)
+  message         String?
+  
+  // Common fields
+  emailConfirmation Boolean       @default(true)
+  smsReminder      Boolean        @default(false)
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  
+  timeSlots       TimeSlot[]
+  
+  @@map("bookings")
+}
+
+model TimeSlot {
+  id        String   @id @default(cuid())
+  date      DateTime
+  startTime String   // Format: "HH:MM"
+  endTime   String   // Format: "HH:MM"
+  isBooked  Boolean  @default(false)
+  bookingId String?  // Optional reference to booking
+  
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+  
+  @@unique([date, startTime])
+  @@map("time_slots")
+}
+
+model WeeklySchedule {
+  id          String   @id @default(cuid())
+  weekNumber  Int      // 1 or 2
+  startDate   DateTime // Start date of the week period
+  endDate     DateTime // End date of the week period
+  isActive    Boolean  @default(true)
+  
+  scheduleSlots ScheduleSlot[]
+  
+  @@unique([weekNumber])
+  @@map("weekly_schedules")
+}
+
+model ScheduleSlot {
+  id               String         @id @default(cuid())
+  weeklyScheduleId String
+  weeklySchedule   WeeklySchedule @relation(fields: [weeklyScheduleId], references: [id], onDelete: Cascade)
+  
+  dayOfWeek        Int            // 0 = Sunday, 1 = Monday, etc.
+  startTime        String         // Format: "HH:MM"
+  endTime          String         // Format: "HH:MM"
+  
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  
+  @@map("schedule_slots")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+  COACH
+}
+
+enum BookingType {
+  INDOOR
+  ACCOMPANIED
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
