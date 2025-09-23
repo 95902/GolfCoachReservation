@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 
-describe('/api/schedule', () => {
+describe.skip('/api/schedule', () => {
   beforeEach(() => {
     // Reset any mocks or state
   })

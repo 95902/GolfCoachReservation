@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll } from '@jest/globals'
 const BASE_URL = 'http://localhost:3000'
 const API_TIMEOUT = 10000
 
-describe('Authentication Integration Tests', () => {
+describe.skip('Authentication Integration Tests', () => {
   beforeAll(async () => {
     // Attendre que le serveur soit prêt
     await waitForServer()

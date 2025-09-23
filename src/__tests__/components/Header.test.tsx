@@ -43,8 +43,8 @@ describe('Header Component', () => {
   it('should display the logo', () => {
     render(<Header />)
     
-    // Check if logo is present (assuming it has alt text or is an image)
-    const logo = screen.getByAltText('Golf Indoor') || screen.getByText('Golf Indoor')
+    // Check if logo is present (text-based logo)
+    const logo = screen.getByText('Golf Indoor TrackMan 4')
     expect(logo).toBeDefined()
   })
 
