@@ -31,7 +31,7 @@ export const scheduleOptimizations = {
         weekNumber: true,
         startDate: true,
         endDate: true,
-        timeSlots: true,
+        scheduleSlots: true,
         // Ne pas charger les relations lourdes si pas nécessaires
       },
       orderBy: {
@@ -56,7 +56,7 @@ export const scheduleOptimizations = {
         weekNumber: true,
         startDate: true,
         endDate: true,
-        timeSlots: true,
+        scheduleSlots: true,
       }
     })
 
@@ -75,7 +75,7 @@ export const scheduleOptimizations = {
         weekNumber: true,
         startDate: true,
         endDate: true,
-        timeSlots: true,
+        scheduleSlots: true,
       }
     })
 
@@ -153,14 +153,14 @@ export const userOptimizations = {
 export const bookingOptimizations = {
   // Récupérer les réservations avec relations optimisées
   async getBookingsOptimized(filters?: {
-    userId?: string
+    customerId?: string
     status?: string
     startDate?: Date
     endDate?: Date
   }) {
     const where: Prisma.BookingWhereInput = {}
     
-    if (filters?.userId) where.userId = filters.userId
+    if (filters?.customerId) where.customerId = filters.customerId
     if (filters?.status) where.status = filters.status as any
     if (filters?.startDate || filters?.endDate) {
       where.createdAt = {}
@@ -179,19 +179,20 @@ export const bookingOptimizations = {
         status: true,
         createdAt: true,
         updatedAt: true,
-        user: {
+        customer: {
           select: {
             id: true,
-            name: true,
+            firstName: true,
+            lastName: true,
             email: true,
           }
         },
-        timeSlot: {
+        timeSlots: {
           select: {
             id: true,
             startTime: true,
             endTime: true,
-            dayOfWeek: true,
+            date: true,
           }
         }
       },

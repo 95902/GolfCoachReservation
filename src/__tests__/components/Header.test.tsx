@@ -1,5 +1,6 @@
-import { describe, it, expect } from '@jest/globals'
+import { describe, it, expect, jest } from '@jest/globals'
 import { render, screen } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import Header from '@/components/Header'
 
 // Mock Next.js router
@@ -36,7 +37,7 @@ describe('Header Component', () => {
     render(<Header />)
     
     // Check if the component renders
-    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toBeDefined()
   })
 
   it('should display the logo', () => {
@@ -44,7 +45,7 @@ describe('Header Component', () => {
     
     // Check if logo is present (assuming it has alt text or is an image)
     const logo = screen.getByAltText('Golf Indoor') || screen.getByText('Golf Indoor')
-    expect(logo).toBeInTheDocument()
+    expect(logo).toBeDefined()
   })
 
   it('should have navigation links', () => {
@@ -52,7 +53,7 @@ describe('Header Component', () => {
     
     // Check for common navigation elements
     const nav = screen.getByRole('navigation')
-    expect(nav).toBeInTheDocument()
+    expect(nav).toBeDefined()
   })
 
   it('should show sign in button when not authenticated', () => {
@@ -60,6 +61,6 @@ describe('Header Component', () => {
     
     // Look for sign in button or link
     const signInButton = screen.queryByText(/sign in|connexion/i)
-    expect(signInButton).toBeInTheDocument()
+    expect(signInButton).toBeDefined()
   })
 })

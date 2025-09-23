@@ -72,7 +72,8 @@ describe('NextAuth.js Configuration', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'admin',
@@ -91,7 +92,8 @@ describe('NextAuth.js Configuration', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'coach',
@@ -108,11 +110,15 @@ describe('NextAuth.js Configuration', () => {
         email: 'user@example.com',
         name: 'Test User',
         password: 'hashedpassword',
-        role: 'USER',
+        role: 'USER' as const,
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       mockDb.user.findUnique.mockResolvedValue(mockUser)
-      mockBcrypt.compare.mockResolvedValue(true)
+      ;(mockBcrypt.compare as any).mockResolvedValue(true)
 
       const credentials = {
         email: 'user@example.com',
@@ -121,7 +127,8 @@ describe('NextAuth.js Configuration', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'user123',
@@ -146,7 +153,8 @@ describe('NextAuth.js Configuration', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -160,7 +168,8 @@ describe('NextAuth.js Configuration', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -184,7 +193,7 @@ describe('NextAuth.js Configuration', () => {
       const token = { sub: 'user123', role: 'USER' }
       const user = undefined
 
-      const result = await authOptions.callbacks?.jwt?.({ token, user })
+      const result = await authOptions.callbacks?.jwt?.({ token, user } as any)
 
       expect(result).toEqual({
         sub: 'user123',
@@ -198,7 +207,7 @@ describe('NextAuth.js Configuration', () => {
       const session = { user: {} }
       const token = { sub: 'user123', role: 'ADMIN' }
 
-      const result = await authOptions.callbacks?.session?.({ session, token })
+      const result = await authOptions.callbacks?.session?.({ session, token } as any)
 
       expect(result).toEqual({
         user: {
@@ -212,7 +221,7 @@ describe('NextAuth.js Configuration', () => {
       const session = { user: {} }
       const token = null
 
-      const result = await authOptions.callbacks?.session?.({ session, token })
+      const result = await authOptions.callbacks?.session?.({ session, token } as any)
 
       expect(result).toEqual({
         user: {},

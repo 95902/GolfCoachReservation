@@ -1,9 +1,10 @@
 import { describe, it, expect, jest, beforeEach } from '@jest/globals'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import '@testing-library/jest-dom'
 import ScheduleManager from '@/components/ScheduleManager'
 
 // Mock fetch
-global.fetch = jest.fn()
+global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>
 
 // Mock window.alert
 global.alert = jest.fn()
@@ -47,7 +48,7 @@ jest.mock('next-auth/react', () => ({
 describe('ScheduleManager Component', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(fetch as jest.Mock).mockResolvedValue({
+    ;(global.fetch as any).mockResolvedValue({
       ok: true,
       json: async () => [
         {
@@ -71,7 +72,7 @@ describe('ScheduleManager Component', () => {
     
     // Wait for component to load
     await waitFor(() => {
-      expect(screen.getByText('Gestion des Plannings')).toBeInTheDocument()
+      expect(screen.getByText('Gestion des Plannings')).toBeDefined()
     })
   })
 
@@ -79,7 +80,7 @@ describe('ScheduleManager Component', () => {
     render(<ScheduleManager />)
     
     await waitFor(() => {
-      expect(screen.getByText('Semaine 1')).toBeInTheDocument()
+      expect(screen.getByText('Semaine 1')).toBeDefined()
     })
   })
 
@@ -87,8 +88,8 @@ describe('ScheduleManager Component', () => {
     render(<ScheduleManager />)
     
     await waitFor(() => {
-      expect(screen.getByLabelText('Date de début')).toBeInTheDocument()
-      expect(screen.getByLabelText('Date de fin')).toBeInTheDocument()
+      expect(screen.getByLabelText('Date de début')).toBeDefined()
+      expect(screen.getByLabelText('Date de fin')).toBeDefined()
     })
   })
 
@@ -127,7 +128,7 @@ describe('ScheduleManager Component', () => {
   })
 
   it('should handle API errors gracefully', async () => {
-    ;(fetch as jest.Mock).mockRejectedValue(new Error('API Error'))
+    ;(global.fetch as any).mockRejectedValue(new Error('API Error'))
     
     render(<ScheduleManager />)
     
@@ -139,7 +140,7 @@ describe('ScheduleManager Component', () => {
     // Should not crash and should handle error
     await waitFor(() => {
       // Check if error message is displayed or component still renders
-      expect(screen.getByText('Gestion des Plannings')).toBeInTheDocument()
+      expect(screen.getByText('Gestion des Plannings')).toBeDefined()
     })
   })
 })

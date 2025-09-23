@@ -122,6 +122,7 @@ import { securityMiddleware, addSecurityHeaders, sanitizeInput } from '@/lib/sec
 export async function POST(request: NextRequest) {
   const startTime = Date.now()
   let response: NextResponse
+  let session: any = null
 
   // Security middleware
   const securityResponse = securityMiddleware(request)
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
     })
     
     // Authentication check
-    const session = await auth()
+    session = await auth()
     if (!session || !session.user) {
       throw new CustomError(
         ErrorCode.AUTHENTICATION_ERROR,
@@ -172,7 +173,7 @@ export async function POST(request: NextRequest) {
     const { weekNumber, startDate, endDate, timeSlots } = validation.data
 
     logDatabase('CREATE', 'weeklySchedule', {
-      weekNumber: parseInt(weekNumber),
+      weekNumber: weekNumber,
       startDate,
       endDate,
       timeSlotsCount: timeSlots?.length || 0
@@ -183,7 +184,13 @@ export async function POST(request: NextRequest) {
       weekNumber,
       startDate,
       endDate,
-      timeSlots: timeSlots || []
+      scheduleSlots: {
+        create: (timeSlots || []).map(slot => ({
+          dayOfWeek: parseInt(slot.dayOfWeek),
+          startTime: slot.startTime,
+          endTime: slot.endTime
+        }))
+      }
     })
 
     response = NextResponse.json({ 

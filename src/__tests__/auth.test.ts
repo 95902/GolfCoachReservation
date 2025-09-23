@@ -35,7 +35,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'admin',
@@ -54,7 +55,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -70,7 +72,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'coach',
@@ -89,11 +92,15 @@ describe('Authentication', () => {
         email: 'user@example.com',
         name: 'Test User',
         password: 'hashedpassword',
-        role: 'USER',
+        role: 'USER' as const,
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       mockDb.user.findUnique.mockResolvedValue(mockUser)
-      mockBcrypt.compare.mockResolvedValue(true)
+      ;(mockBcrypt.compare as any).mockResolvedValue(true)
 
       const credentials = {
         email: 'user@example.com',
@@ -102,7 +109,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toEqual({
           id: 'user123',
@@ -123,11 +131,15 @@ describe('Authentication', () => {
         email: 'user@example.com',
         name: 'Test User',
         password: 'hashedpassword',
-        role: 'USER',
+        role: 'USER' as const,
+        emailVerified: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       }
 
       mockDb.user.findUnique.mockResolvedValue(mockUser)
-      mockBcrypt.compare.mockResolvedValue(false)
+      ;(mockBcrypt.compare as any).mockResolvedValue(false)
 
       const credentials = {
         email: 'user@example.com',
@@ -136,7 +148,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -152,7 +165,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -168,7 +182,8 @@ describe('Authentication', () => {
 
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(credentials)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(credentials, mockRequest)
 
         expect(result).toBeNull()
       }
@@ -177,7 +192,8 @@ describe('Authentication', () => {
     it('should reject null credentials', async () => {
       const provider = authOptions.providers[0]
       if (provider && 'authorize' in provider) {
-        const result = await provider.authorize(null)
+        const mockRequest = new Request('http://localhost:3000/api/auth/signin')
+        const result = await provider.authorize(null as any, mockRequest)
 
         expect(result).toBeNull()
       }

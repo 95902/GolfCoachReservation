@@ -108,7 +108,7 @@ export function recordMetrics(
   const method = req.method
   const statusCode = res.status
   const userAgent = req.headers.get('user-agent') || undefined
-  const ip = req.ip || req.headers.get('x-forwarded-for') || undefined
+  const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || undefined
 
   metricsCollector.record({
     endpoint,

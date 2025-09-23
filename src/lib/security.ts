@@ -56,7 +56,7 @@ const RATE_LIMIT_WINDOW = 15 * 60 * 1000 // 15 minutes
 const RATE_LIMIT_MAX_REQUESTS = 100 // 100 requêtes par fenêtre
 
 export function checkRateLimit(request: NextRequest): { allowed: boolean; remaining: number; resetTime: number } {
-  const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown'
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
   const now = Date.now()
   const key = `${ip}-${Math.floor(now / RATE_LIMIT_WINDOW)}`
   
