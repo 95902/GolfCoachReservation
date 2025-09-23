@@ -11,7 +11,7 @@ export const authOptions: NextAuthConfig = {
         email: { label: "Email", type: "email" },
         password: { label: "Mot de passe", type: "password" }
       },
-      async authorize(credentials) {
+      async authorize(credentials, request) {
         if (!credentials?.email || !credentials?.password) {
           return null
         }
@@ -64,9 +64,6 @@ export const authOptions: NextAuthConfig = {
       }
     })
   ],
-  session: {
-    strategy: "jwt"
-  },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -85,5 +82,5 @@ export const authOptions: NextAuthConfig = {
   pages: {
     signIn: "/auth/signin"
   },
-  secret: process.env.NEXTAUTH_SECRET
+  trustHost: true
 }
